@@ -1,0 +1,12 @@
+.env
+.vercel
+coverage
+node_modules
+*.test.cjs
+*.test.cjsx
+*.test.js
+*.test.jsx
+*.test.mjs
+*.test.mjsx
+*.test.ts
+*.test.tsx
