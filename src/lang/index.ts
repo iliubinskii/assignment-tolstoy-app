@@ -1,6 +1,9 @@
 export const lang = {
   Add: "Add",
+  Back: "Back",
   EnterUrl: "Enter a URL",
+  ErrorFetchingMetadata: "Error fetching metadata",
+  Image: "Image",
   MetadataExtractionTool: "Metadata Extraction Tool",
   RemoveUrl: "Remove URL",
   ServiceIsTemporarilyUnavailable:

@@ -13,6 +13,7 @@ import {
   useTheme
 } from "@mui/material";
 import type { FormEvent, ReactElement } from "react";
+import type { FetchMetadataResponse } from "../schema";
 import React, { useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import { fetchMetadata } from "../api";
@@ -20,12 +21,19 @@ import { lang } from "../lang";
 
 /**
  * URL submission form component.
+ * @param props - The properties of the URL submission form component.
+ * @param props.onMetadata - The callback to handle the metadata.
+ * @param props.urls - The initial URLs to submit.
  * @returns The URL submission form component.
  */
-export function UrlSubmissionForm(): ReactElement {
+export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
   const [errors, setErrors] = useState<readonly string[]>([]);
 
-  const [items, setItems] = useState<readonly Item[]>([]);
+  const [items, setItems] = useState<readonly Item[]>(
+    urls.map(url => {
+      return { url };
+    })
+  );
 
   const [loading, setLoading] = useState(false);
 
@@ -79,10 +87,11 @@ export function UrlSubmissionForm(): ReactElement {
                 })
               );
             }
-          // eslint-disable-next-line no-warning-comments -- Postponed
-          // TODO: Show results
-          // eslint-disable-next-line no-console -- Temp
-          else console.log(response);
+          else
+            onMetadata(
+              items.map(item => item.url),
+              response
+            );
         else {
           setErrors([lang.ServiceIsTemporarilyUnavailable]);
           setItems(prev =>
@@ -206,6 +215,14 @@ export function UrlSubmissionForm(): ReactElement {
       </Box>
     </Box>
   );
+}
+
+export interface Props {
+  readonly onMetadata: (
+    urls: readonly string[],
+    metadata: readonly FetchMetadataResponse[]
+  ) => void;
+  readonly urls: readonly string[];
 }
 
 interface Item {

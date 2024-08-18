@@ -1,7 +1,8 @@
 import { Box, Container, CssBaseline, Typography } from "@mui/material";
-import React from "react";
+import { MetadataReport, UrlSubmissionForm } from "./components";
+import type { FetchMetadataResponse } from "./schema";
+import React, { useState } from "react";
 import type { ReactElement } from "react";
-import { UrlSubmissionForm } from "./components";
 import { lang } from "./lang";
 
 /**
@@ -9,6 +10,10 @@ import { lang } from "./lang";
  * @returns The main component of the application.
  */
 function App(): ReactElement {
+  const [metadata, setMetadata] = useState<readonly FetchMetadataResponse[]>();
+
+  const [urls, setUrls] = useState<readonly string[]>([]);
+
   return (
     <>
       <CssBaseline />
@@ -57,7 +62,22 @@ function App(): ReactElement {
             >
               {lang.MetadataExtractionTool}
             </Typography>
-            <UrlSubmissionForm />
+            {metadata ? (
+              <MetadataReport
+                metadata={metadata}
+                onBack={() => {
+                  setMetadata(undefined);
+                }}
+              />
+            ) : (
+              <UrlSubmissionForm
+                onMetadata={(nextUrls, nextMetadata) => {
+                  setUrls(nextUrls);
+                  setMetadata(nextMetadata);
+                }}
+                urls={urls}
+              />
+            )}
           </Container>
         </Box>
       </Box>
