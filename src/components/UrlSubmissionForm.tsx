@@ -57,24 +57,33 @@ export function UrlSubmissionForm(): ReactElement {
       try {
         const response = await fetchMetadata(items.map(item => item.url));
 
-        if (Array.isArray(response))
+        if (response)
+          if ("errorCode" in response)
+            if ("details" in response && response.details) {
+              const { details } = response;
+
+              setErrors(details.formErrors);
+              setItems(prev =>
+                prev.map((item, index) => {
+                  return {
+                    ...item,
+                    errors: details.fieldErrors[index]
+                  };
+                })
+              );
+            } else {
+              setErrors([lang.ServiceIsTemporarilyUnavailable]);
+              setItems(prev =>
+                prev.map(item => {
+                  return { url: item.url };
+                })
+              );
+            }
           // eslint-disable-next-line no-warning-comments -- Postponed
           // TODO: Show results
           // eslint-disable-next-line no-console -- Temp
-          console.log(response);
-        else if (response && "details" in response && response.details) {
-          const details = response.details;
-
-          setErrors(details.formErrors);
-          setItems(prev =>
-            prev.map((item, index) => {
-              return {
-                ...item,
-                errors: details.fieldErrors[index]
-              };
-            })
-          );
-        } else {
+          else console.log(response);
+        else {
           setErrors([lang.ServiceIsTemporarilyUnavailable]);
           setItems(prev =>
             prev.map(item => {
