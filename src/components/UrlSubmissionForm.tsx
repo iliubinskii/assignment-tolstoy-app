@@ -12,12 +12,13 @@ import {
   Typography,
   useTheme
 } from "@mui/material";
-import type { FormEvent, ReactElement } from "react";
+import type { ChangeEventHandler, FormEventHandler, ReactElement } from "react";
 import type { FetchMetadataResponse } from "../schema";
 import React, { useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import { fetchMetadata } from "../api";
 import { lang } from "../lang";
+import zod from "zod";
 
 /**
  * URL submission form component.
@@ -28,6 +29,8 @@ import { lang } from "../lang";
  */
 export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
   const [errors, setErrors] = useState<readonly string[]>([]);
+
+  const [invalidUrl, setInvalidUrl] = useState(false);
 
   const [items, setItems] = useState<readonly Item[]>(
     urls.map(url => {
@@ -42,15 +45,29 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
   const [url, setUrl] = useState<string>("");
 
   const addUrl = (): void => {
-    setItems([...items, { url }]);
-    setUrl("");
+    const parsed = UrlValidationSchema.safeParse(url);
+
+    if (parsed.success) {
+      setItems([...items, { url }]);
+      setUrl("");
+      setInvalidUrl(false);
+    } else setInvalidUrl(true);
   };
 
   const removeUrl = (index: number): void => {
     setItems(items.filter((_, i) => i !== index));
   };
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>): void => {
+  const urlChangeHandler: ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = e => {
+    setUrl(e.target.value);
+
+    if (invalidUrl && UrlValidationSchema.safeParse(e.target.value).success)
+      setInvalidUrl(false);
+  };
+
+  const formSubmitHandler: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises -- Ok
@@ -107,7 +124,7 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
   };
 
   return (
-    <Box component="form" onSubmit={onSubmit}>
+    <Box component="form" onSubmit={formSubmitHandler}>
       <Typography paragraph textAlign="center" variant="body1">
         {lang.instructions}
       </Typography>
@@ -134,11 +151,22 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
           }}
         >
           <TextField
-            fullWidth
-            label={lang.EnterUrl}
-            onChange={e => {
-              setUrl(e.target.value);
+            FormHelperTextProps={{
+              sx: {
+                bottom: 0,
+                left: 0,
+                maxHeight: invalidUrl ? "30px" : "0",
+                overflow: "hidden",
+                position: "absolute",
+                transform: "translateY(100%)",
+                transition: "max-height 0.3s ease"
+              }
             }}
+            error={invalidUrl}
+            fullWidth
+            helperText={lang.InvalidUrl}
+            label={lang.EnterUrl}
+            onChange={urlChangeHandler}
             value={url}
             variant="outlined"
           />
@@ -229,3 +257,5 @@ interface Item {
   readonly errors?: readonly string[] | undefined;
   readonly url: string;
 }
+
+const UrlValidationSchema = zod.string().url();
