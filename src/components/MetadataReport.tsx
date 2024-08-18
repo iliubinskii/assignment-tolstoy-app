@@ -41,11 +41,27 @@ export function MetadataReport({ metadata, onBack }: Props): ReactElement {
             ) : (
               <Box alignItems="center" display="flex">
                 {item.imageUrl && (
-                  <Box mr={2}>
+                  <Box
+                    mr={2}
+                    sx={{
+                      height: 20,
+                      overflow: "hidden",
+                      width: 20
+                    }}
+                  >
                     <img
                       alt={item.title ?? lang.Image}
+                      onError={e => {
+                        e.currentTarget.src = "/no-image.png";
+                      }}
                       src={item.imageUrl}
-                      style={{ height: 20, objectFit: "contain", width: 20 }}
+                      style={{
+                        height: 20,
+                        maxHeight: 20,
+                        maxWidth: 20,
+                        objectFit: "contain",
+                        width: 20
+                      }}
                     />
                   </Box>
                 )}
