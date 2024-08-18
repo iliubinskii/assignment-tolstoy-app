@@ -31,32 +31,34 @@ export async function fetchMetadata(
   }
 }
 
-const FetchMetadataResponseValidationSchema = zod
-  .array(
-    zod
-      .object({
+// Use `zod.strictObject` to avoid issue with `zod.object` removing properties
+// required by the second `zod.object` in the union.
+// eslint-disable-next-line no-warning-comments -- Postponed
+// TODO: Rollback to zod.object once the issue is fixed.
+const FetchMetadataResponseValidationSchema = zod.union([
+  zod.array(
+    zod.union([
+      zod.strictObject({
         description: zod.string().optional(),
         imageUrl: zod.string().optional(),
         title: zod.string().optional(),
         url: zod.string()
+      }),
+      zod.strictObject({
+        errorCode: zod.string(),
+        errorMessage: zod.string(),
+        url: zod.string()
       })
-      .or(
-        zod.object({
-          errorCode: zod.string(),
-          errorMessage: zod.string(),
-          url: zod.string()
-        })
-      )
-  )
-  .or(
-    zod.object({
-      details: zod
-        .object({
-          fieldErrors: zod.record(zod.array(zod.string())),
-          formErrors: zod.array(zod.string())
-        })
-        .optional(),
-      errorCode: zod.string(),
-      errorMessage: zod.string()
-    })
-  );
+    ])
+  ),
+  zod.strictObject({
+    details: zod
+      .strictObject({
+        fieldErrors: zod.record(zod.array(zod.string())),
+        formErrors: zod.array(zod.string())
+      })
+      .optional(),
+    errorCode: zod.string(),
+    errorMessage: zod.string()
+  })
+]);
