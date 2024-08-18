@@ -27,23 +27,51 @@ export function MetadataReport({ metadata, onBack }: Props): ReactElement {
             {"errorCode" in item ? (
               <ListItemText
                 primary={lang.ErrorFetchingMetadata}
+                primaryTypographyProps={{
+                  sx: {
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  }
+                }}
                 secondary={
                   <>
-                    <Typography color="error" variant="body2">
+                    <Typography
+                      color="error"
+                      sx={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
+                      }}
+                      variant="body2"
+                    >
                       {item.errorMessage}
                     </Typography>
-                    <Typography color="textSecondary" variant="caption">
+                    <Typography
+                      color="textSecondary"
+                      sx={{
+                        display: "block",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis"
+                      }}
+                      variant="caption"
+                    >
                       {item.url}
                     </Typography>
                   </>
                 }
               />
             ) : (
-              <Box alignItems="center" display="flex">
+              <Box
+                alignItems="center"
+                display="flex"
+                sx={{
+                  width: "100%"
+                }}
+              >
                 {item.imageUrl && (
                   <Box
                     mr={2}
                     sx={{
+                      flexShrink: 0,
                       height: 20,
                       overflow: "hidden",
                       width: 20
@@ -67,14 +95,34 @@ export function MetadataReport({ metadata, onBack }: Props): ReactElement {
                 )}
                 <ListItemText
                   primary={item.title ?? item.url}
+                  primaryTypographyProps={{
+                    sx: {
+                      overflow: "hidden",
+                      textOverflow: "ellipsis"
+                    }
+                  }}
                   secondary={
                     <>
                       {item.description && (
-                        <Typography variant="body2">
+                        <Typography
+                          sx={{
+                            overflow: "hidden",
+                            textOverflow: "ellipsis"
+                          }}
+                          variant="body2"
+                        >
                           {item.description}
                         </Typography>
                       )}
-                      <Typography color="textSecondary" variant="caption">
+                      <Typography
+                        color="textSecondary"
+                        sx={{
+                          display: "block",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis"
+                        }}
+                        variant="caption"
+                      >
                         {item.url}
                       </Typography>
                     </>

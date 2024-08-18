@@ -194,11 +194,20 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
               sx={{
                 color: item.errors ? theme.palette.error.main : undefined,
                 display: "flex",
+                gap: 1,
                 justifyContent: "space-between",
                 transition: "color 0.3s ease"
               }}
             >
-              <ListItemText primary={item.url} />
+              <ListItemText
+                primary={item.url}
+                primaryTypographyProps={{
+                  sx: {
+                    overflow: "hidden",
+                    textOverflow: "ellipsis"
+                  }
+                }}
+              />
               <IconButton
                 aria-label={lang.RemoveUrl}
                 disabled={loading}
