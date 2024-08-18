@@ -44,16 +44,6 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
 
   const [url, setUrl] = useState<string>("");
 
-  const addUrl = (): void => {
-    const parsed = UrlValidationSchema.safeParse(url);
-
-    if (parsed.success) {
-      setItems([...items, { url }]);
-      setUrl("");
-      setInvalidUrl(false);
-    } else setInvalidUrl(true);
-  };
-
   const removeUrl = (index: number): void => {
     setItems(items.filter((_, i) => i !== index));
   };
@@ -67,7 +57,19 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
       setInvalidUrl(false);
   };
 
-  const formSubmitHandler: FormEventHandler<HTMLFormElement> = e => {
+  const urlSubmitHandler: FormEventHandler<HTMLFormElement> = e => {
+    e.preventDefault();
+
+    const parsed = UrlValidationSchema.safeParse(url);
+
+    if (parsed.success) {
+      setItems([...items, { url }]);
+      setUrl("");
+      setInvalidUrl(false);
+    } else setInvalidUrl(true);
+  };
+
+  const submitHandler: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
 
     // eslint-disable-next-line @typescript-eslint/no-floating-promises -- Ok
@@ -124,7 +126,7 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
   };
 
   return (
-    <Box component="form" onSubmit={formSubmitHandler}>
+    <Box>
       <Typography paragraph textAlign="center" variant="body1">
         {lang.instructions}
       </Typography>
@@ -145,6 +147,8 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
         }}
       >
         <Box
+          component="form"
+          onSubmit={urlSubmitHandler}
           sx={{
             display: "flex",
             gap: 1
@@ -162,6 +166,7 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
                 transition: "max-height 0.3s ease"
               }
             }}
+            disabled={loading}
             error={invalidUrl}
             fullWidth
             helperText={lang.InvalidUrl}
@@ -172,12 +177,11 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
           />
           <Button
             disabled={url.length === 0}
-            onClick={addUrl}
             startIcon={<Add />}
             sx={{
               flexShrink: 0
             }}
-            type="button"
+            type="submit"
             variant="outlined"
           >
             {lang.Add}
@@ -211,35 +215,44 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
             </ListItem>
           ))}
         </List>
-        <Button
-          color="primary"
-          disabled={items.length === 0 || loading}
-          size="large"
-          startIcon={
-            <Box
-              sx={{
-                alignItems: "center",
-                display: "flex",
-                justifyContent: "center",
-                width: 20
-              }}
-            >
-              {loading ? (
-                <CircularProgress color="inherit" size={20} />
-              ) : (
-                <SendIcon
-                  sx={{
-                    fontSize: 20
-                  }}
-                />
-              )}
-            </Box>
-          }
-          type="submit"
-          variant="contained"
+        <Box
+          component="form"
+          onSubmit={submitHandler}
+          sx={{
+            display: "flex",
+            flexDirection: "column"
+          }}
         >
-          {lang.Submit}
-        </Button>
+          <Button
+            color="primary"
+            disabled={items.length === 0 || loading}
+            size="large"
+            startIcon={
+              <Box
+                sx={{
+                  alignItems: "center",
+                  display: "flex",
+                  justifyContent: "center",
+                  width: 20
+                }}
+              >
+                {loading ? (
+                  <CircularProgress color="inherit" size={20} />
+                ) : (
+                  <SendIcon
+                    sx={{
+                      fontSize: 20
+                    }}
+                  />
+                )}
+              </Box>
+            }
+            type="submit"
+            variant="contained"
+          >
+            {lang.Submit}
+          </Button>
+        </Box>
       </Box>
     </Box>
   );
