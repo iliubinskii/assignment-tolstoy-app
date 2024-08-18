@@ -3,6 +3,7 @@ import {
   Alert,
   Box,
   Button,
+  CircularProgress,
   Container,
   CssBaseline,
   IconButton,
@@ -15,6 +16,7 @@ import {
 } from "@mui/material";
 import type { FormEvent, ReactElement } from "react";
 import React, { useState } from "react";
+import SendIcon from "@mui/icons-material/Send";
 import { fetchMetadata } from "./api";
 import { lang } from "./lang";
 
@@ -26,6 +28,8 @@ function App(): ReactElement {
   const [errors, setErrors] = useState<readonly string[]>([]);
 
   const [items, setItems] = useState<readonly Item[]>([]);
+
+  const [loading, setLoading] = useState(false);
 
   const theme = useTheme();
 
@@ -50,32 +54,38 @@ function App(): ReactElement {
      * Custom handler for the form submission.
      */
     async function handleFormSubmission(): Promise<void> {
-      const response = await fetchMetadata(items.map(item => item.url));
+      setLoading(true);
 
-      if (Array.isArray(response))
-        // eslint-disable-next-line no-warning-comments -- Postponed
-        // TODO: Show results
-        // eslint-disable-next-line no-console -- Temp
-        console.log(response);
-      else if (response && "details" in response && response.details) {
-        const details = response.details;
+      try {
+        const response = await fetchMetadata(items.map(item => item.url));
 
-        setErrors(details.formErrors);
-        setItems(prev =>
-          prev.map((item, index) => {
-            return {
-              ...item,
-              errors: details.fieldErrors[index]
-            };
-          })
-        );
-      } else {
-        setErrors([lang.ServiceIsTemporarilyUnavailable]);
-        setItems(prev =>
-          prev.map(item => {
-            return { url: item.url };
-          })
-        );
+        if (Array.isArray(response))
+          // eslint-disable-next-line no-warning-comments -- Postponed
+          // TODO: Show results
+          // eslint-disable-next-line no-console -- Temp
+          console.log(response);
+        else if (response && "details" in response && response.details) {
+          const details = response.details;
+
+          setErrors(details.formErrors);
+          setItems(prev =>
+            prev.map((item, index) => {
+              return {
+                ...item,
+                errors: details.fieldErrors[index]
+              };
+            })
+          );
+        } else {
+          setErrors([lang.ServiceIsTemporarilyUnavailable]);
+          setItems(prev =>
+            prev.map(item => {
+              return { url: item.url };
+            })
+          );
+        }
+      } finally {
+        setLoading(false);
       }
     }
   };
@@ -191,6 +201,7 @@ function App(): ReactElement {
                     <ListItemText primary={item.url} />
                     <IconButton
                       aria-label={lang.RemoveUrl}
+                      disabled={loading}
                       edge="end"
                       onClick={() => {
                         removeUrl(index);
@@ -206,8 +217,28 @@ function App(): ReactElement {
               </List>
               <Button
                 color="primary"
-                disabled={items.length === 0}
+                disabled={items.length === 0 || loading}
                 size="large"
+                startIcon={
+                  <Box
+                    sx={{
+                      alignItems: "center",
+                      display: "flex",
+                      justifyContent: "center",
+                      width: 20
+                    }}
+                  >
+                    {loading ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : (
+                      <SendIcon
+                        sx={{
+                          fontSize: 20
+                        }}
+                      />
+                    )}
+                  </Box>
+                }
                 type="submit"
                 variant="contained"
               >
