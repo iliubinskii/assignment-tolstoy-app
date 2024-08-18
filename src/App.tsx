@@ -1,5 +1,6 @@
 import { Add, Delete } from "@mui/icons-material";
 import {
+  Alert,
   Box,
   Button,
   Container,
@@ -9,10 +10,12 @@ import {
   ListItem,
   ListItemText,
   TextField,
-  Typography
+  Typography,
+  useTheme
 } from "@mui/material";
 import type { FormEvent, ReactElement } from "react";
 import React, { useState } from "react";
+import { fetchMetadata } from "./api";
 import { lang } from "./lang";
 
 /**
@@ -20,21 +23,61 @@ import { lang } from "./lang";
  * @returns The main component of the application.
  */
 function App(): ReactElement {
+  const [errors, setErrors] = useState<readonly string[]>([]);
+
+  const [items, setItems] = useState<readonly Item[]>([]);
+
+  const theme = useTheme();
+
   const [url, setUrl] = useState<string>("");
 
-  const [urls, setUrls] = useState<readonly string[]>([]);
-
   const addUrl = (): void => {
-    setUrls([...urls, url]);
+    setItems([...items, { url }]);
     setUrl("");
   };
 
   const removeUrl = (index: number): void => {
-    setUrls(urls.filter((_, i) => i !== index));
+    setItems(items.filter((_, i) => i !== index));
   };
 
   const onSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises -- Ok
+    handleFormSubmission();
+
+    /**
+     * Custom handler for the form submission.
+     */
+    async function handleFormSubmission(): Promise<void> {
+      const response = await fetchMetadata(items.map(item => item.url));
+
+      if (Array.isArray(response))
+        // eslint-disable-next-line no-warning-comments -- Postponed
+        // TODO: Show results
+        // eslint-disable-next-line no-console -- Temp
+        console.log(response);
+      else if (response && "details" in response && response.details) {
+        const details = response.details;
+
+        setErrors(details.formErrors);
+        setItems(prev =>
+          prev.map((item, index) => {
+            return {
+              ...item,
+              errors: details.fieldErrors[index]
+            };
+          })
+        );
+      } else {
+        setErrors([lang.ServiceIsTemporarilyUnavailable]);
+        setItems(prev =>
+          prev.map(item => {
+            return { url: item.url };
+          })
+        );
+      }
+    }
   };
 
   return (
@@ -90,6 +133,15 @@ function App(): ReactElement {
             <Typography paragraph textAlign="center" variant="body1">
               {lang.instructions}
             </Typography>
+            {errors.length > 0 && (
+              <Box mb={2}>
+                {errors.map((error, index) => (
+                  <Alert key={index} severity="error">
+                    {error}
+                  </Alert>
+                ))}
+              </Box>
+            )}
             <Box
               sx={{
                 display: "flex",
@@ -126,20 +178,25 @@ function App(): ReactElement {
                 </Button>
               </Box>
               <List>
-                {urls.map((addedUrl, index) => (
+                {items.map((item, index) => (
                   <ListItem
                     key={index}
                     sx={{
+                      color: item.errors ? theme.palette.error.main : undefined,
                       display: "flex",
-                      justifyContent: "space-between"
+                      justifyContent: "space-between",
+                      transition: "color 0.3s ease"
                     }}
                   >
-                    <ListItemText primary={addedUrl} />
+                    <ListItemText primary={item.url} />
                     <IconButton
                       aria-label={lang.RemoveUrl}
                       edge="end"
                       onClick={() => {
                         removeUrl(index);
+                      }}
+                      sx={{
+                        color: "inherit"
                       }}
                     >
                       <Delete />
@@ -149,7 +206,7 @@ function App(): ReactElement {
               </List>
               <Button
                 color="primary"
-                disabled={urls.length === 0}
+                disabled={items.length === 0}
                 size="large"
                 type="submit"
                 variant="contained"
@@ -165,3 +222,8 @@ function App(): ReactElement {
 }
 
 export default App;
+
+interface Item {
+  readonly errors?: readonly string[] | undefined;
+  readonly url: string;
+}
