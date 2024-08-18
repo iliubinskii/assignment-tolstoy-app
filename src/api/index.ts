@@ -31,30 +31,32 @@ export async function fetchMetadata(
   }
 }
 
-const FetchMetadataResponseValidationSchema = zod.union([
-  zod.array(
-    zod.union([
-      zod.object({
+const FetchMetadataResponseValidationSchema = zod
+  .array(
+    zod
+      .object({
         description: zod.string().optional(),
         imageUrl: zod.string().optional(),
         title: zod.string().optional(),
         url: zod.string()
-      }),
-      zod.object({
-        errorCode: zod.string(),
-        errorMessage: zod.string(),
-        url: zod.string()
       })
-    ])
-  ),
-  zod.object({
-    details: zod
-      .object({
-        fieldErrors: zod.record(zod.array(zod.string())),
-        formErrors: zod.array(zod.string())
-      })
-      .optional(),
-    errorCode: zod.string(),
-    errorMessage: zod.string()
-  })
-]);
+      .or(
+        zod.object({
+          errorCode: zod.string(),
+          errorMessage: zod.string(),
+          url: zod.string()
+        })
+      )
+  )
+  .or(
+    zod.object({
+      details: zod
+        .object({
+          fieldErrors: zod.record(zod.array(zod.string())),
+          formErrors: zod.array(zod.string())
+        })
+        .optional(),
+      errorCode: zod.string(),
+      errorMessage: zod.string()
+    })
+  );
