@@ -4,7 +4,8 @@ import {
   List,
   ListItem,
   ListItemText,
-  Typography
+  Typography,
+  useTheme
 } from "@mui/material";
 import type { FetchMetadataResponse } from "../schema";
 import React from "react";
@@ -19,6 +20,8 @@ import { lang } from "../lang";
  * @returns The metadata report component.
  */
 export function MetadataReport({ metadata, onBack }: Props): ReactElement {
+  const theme = useTheme();
+
   return (
     <>
       <List>
@@ -29,6 +32,7 @@ export function MetadataReport({ metadata, onBack }: Props): ReactElement {
                 primary={lang.ErrorFetchingMetadata}
                 primaryTypographyProps={{
                   sx: {
+                    color: theme.palette.error.main,
                     overflow: "hidden",
                     textOverflow: "ellipsis"
                   }
