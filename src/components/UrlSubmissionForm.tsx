@@ -53,7 +53,11 @@ export function UrlSubmissionForm({ onMetadata, urls }: Props): ReactElement {
   > = e => {
     setUrl(e.target.value);
 
-    if (invalidUrl && UrlValidationSchema.safeParse(e.target.value).success)
+    if (
+      invalidUrl &&
+      (e.target.value === "" ||
+        UrlValidationSchema.safeParse(e.target.value).success)
+    )
       setInvalidUrl(false);
   };
 
