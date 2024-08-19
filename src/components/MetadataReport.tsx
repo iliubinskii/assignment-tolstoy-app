@@ -120,11 +120,15 @@ export function MetadataReport({ metadata, onBack }: Props): ReactElement {
                       )}
                       <Typography
                         color="textSecondary"
+                        component="a"
+                        href={item.url}
+                        rel="noopener noreferrer"
                         sx={{
                           display: "block",
                           overflow: "hidden",
                           textOverflow: "ellipsis"
                         }}
+                        target="_blank"
                         variant="caption"
                       >
                         {item.url}
