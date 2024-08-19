@@ -21,7 +21,17 @@ const config = {
   preset: "ts-jest",
   setupFilesAfterEnv: ["./jest.setup-after-env.tsx"],
   testEnvironment: "@happy-dom/jest-environment",
-  testPathIgnorePatterns: ["/node_modules/"]
+  testPathIgnorePatterns: ["/node_modules/"],
+  transform: {
+    "^.+\\.(?:ts|tsx)$": [
+      "ts-jest",
+      {
+        babelConfig: { plugins: ["babel-plugin-transform-vite-meta-env"] },
+        diagnostics: false,
+        isolatedModules: true
+      }
+    ]
+  }
 };
 
 export default config;

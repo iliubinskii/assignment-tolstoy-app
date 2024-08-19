@@ -2,3 +2,6 @@
 
 import "@testing-library/jest-dom";
 import "jest-extended/all";
+import { config } from "dotenv";
+
+config();
