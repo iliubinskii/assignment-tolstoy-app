@@ -3,9 +3,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle
+  DialogTitle,
+  keyframes
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import type { ReactElement } from "react";
 
 /**
@@ -29,12 +30,34 @@ export function ConfirmationDialog({
   onConfirm,
   title
 }: Props): ReactElement {
+  const SHAKE_ANIMATION_DURATION = 300;
+
+  const [shakeEffect, setShakeEffect] = useState(false);
+
+  useEffect(() => {
+    if (shakeEffect) {
+      const timeout = setTimeout(() => {
+        setShakeEffect(false);
+      }, SHAKE_ANIMATION_DURATION);
+
+      return () => {
+        clearTimeout(timeout);
+      };
+    }
+
+    return undefined;
+  }, [shakeEffect]);
+
   return (
     <Dialog
       PaperProps={{
         sx: {
+          animation: shakeEffect ? `${shake} 0.3s` : "none",
           maxWidth: "400px"
         }
+      }}
+      onClose={() => {
+        setShakeEffect(true);
       }}
       open={isOpen}
     >
@@ -61,3 +84,11 @@ export interface Props {
   readonly onConfirm: () => void;
   readonly title: string;
 }
+
+const shake = keyframes`
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+`;
