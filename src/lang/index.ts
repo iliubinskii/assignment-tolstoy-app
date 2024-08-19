@@ -1,6 +1,11 @@
 export const lang = {
   Add: "Add",
   Back: "Back",
+  Cancel: "Cancel",
+  Continue: "Continue",
+  DiscardInput: "Discard Input",
+  DiscardInputMessage:
+    "The URL in the input field is not yet added to the list. Continue anyway?",
   EnterUrl: "Enter a URL",
   ErrorFetchingMetadata: "Error fetching metadata",
   Image: "Image",
