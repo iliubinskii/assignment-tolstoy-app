@@ -4,7 +4,7 @@
 const config = {
   clearMocks: true,
   collectCoverage: false,
-  collectCoverageFrom: ["src/**/*.{ts,tsx}", "!**/*.d.ts"],
+  collectCoverageFrom: ["src/**/*.{ts,tsx}", "!**/*.d.ts", "!src/main.tsx"],
   coverageDirectory: "coverage",
   coverageProvider: "babel",
   coverageReporters: ["lcov"],
@@ -12,10 +12,10 @@ const config = {
     // eslint-disable-next-line no-warning-comments -- Postponed
     // TODO: Better coverage
     global: {
-      branches: 10,
-      functions: 10,
-      lines: 10,
-      statements: 10
+      branches: 30,
+      functions: 30,
+      lines: 30,
+      statements: 30
     }
   },
   preset: "ts-jest",

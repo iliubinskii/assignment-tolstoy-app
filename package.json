@@ -51,6 +51,7 @@
     "@fontsource/roboto": "^5",
     "@mui/icons-material": "^5",
     "@mui/material": "^5",
+    "@testing-library/user-event": "^14",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "envalid": "^8",
