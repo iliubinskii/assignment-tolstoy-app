@@ -28,7 +28,10 @@ const config = {
       {
         babelConfig: { plugins: ["babel-plugin-transform-vite-meta-env"] },
         diagnostics: false,
-        isolatedModules: true
+        isolatedModules: true,
+        tsconfig: {
+          jsx: "react"
+        }
       }
     ]
   }

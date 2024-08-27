@@ -14,7 +14,7 @@
     "importHelpers": true,
     "incremental": true,
     "isolatedModules": true,
-    "jsx": "react",
+    "jsx": "preserve",
     "lib": ["DOM", "ES2022"],
     "module": "ESNext",
     "moduleResolution": "Node10",
